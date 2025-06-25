@@ -1,0 +1,1 @@
+This repo contains ideas for the hackathon.
