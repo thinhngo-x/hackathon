@@ -1,0 +1,171 @@
+[project]
+name = "ticket-assistant"
+version = "1.0.0"
+description = "AI-powered ticket reporting and classification system"
+authors = [
+    {name = "Ticket Assistant Team", email = "team@example.com"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "pydantic>=2.5.0",
+    "httpx>=0.25.0",
+    "groq>=0.4.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "pre-commit>=3.6.0",
+    "ruff>=0.1.15",
+    "bandit>=1.7.5",
+    "safety>=2.3.0",
+    "mypy>=1.8.0",
+    "pydocstyle>=6.3.0",
+    "detect-secrets>=1.4.0",
+    "httpx>=0.25.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/example/ticket-assistant"
+Documentation = "https://github.com/example/ticket-assistant#readme"
+Repository = "https://github.com/example/ticket-assistant.git"
+Issues = "https://github.com/example/ticket-assistant/issues"
+
+[project.scripts]
+ticket-assistant = "ticket_assistant.api.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+python_files = [
+    "test_*.py",
+    "*_test.py",
+]
+python_classes = [
+    "Test*",
+]
+python_functions = [
+    "test_*",
+]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+]
+markers = [
+    "asyncio: marks tests as async (deselect with '-m \"not asyncio\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+asyncio_mode = "auto"
+pythonpath = [
+    "src",
+]
+
+# Ruff configuration
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "ARG", # flake8-unused-arguments
+    "SIM", # flake8-simplify
+    "S",   # flake8-bandit (security)
+    "N",   # pep8-naming
+    "D",   # pydocstyle
+    "RUF", # ruff-specific rules
+]
+ignore = [
+    "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public class
+    "D102", # Missing docstring in public method
+    "D103", # Missing docstring in public function
+    "D104", # Missing docstring in public package
+    "D105", # Missing docstring in magic method
+    "D106", # Missing docstring in public nested class
+    "D107", # Missing docstring in __init__
+    "S101", # Use of assert detected (useful for tests)
+    "S104", # Binding to all interfaces (intentional for dev)
+    "S603", # subprocess call without shell=True
+    "S607", # Starting a process with a partial executable path
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "S101",  # Use of assert (expected in tests)
+    "ARG",   # Unused function arguments (fixtures)
+    "D",     # Docstring requirements (not needed in tests)
+    "SIM",   # Simplify rules (tests can be more explicit)
+]
+"conftest.py" = [
+    "D100",  # Missing docstring in public module
+]
+"**/test_*.py" = [
+    "S101",  # Use of assert
+    "D",     # Docstring requirements
+]
+"src/ticket_assistant/api/*.py" = [
+    "B008",  # Function calls in argument defaults (FastAPI dependency injection)
+]
+"tests/integration/*.py" = [
+    "E402",  # Module level imports not at top (needed for path manipulation)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ticket_assistant"]
+force-single-line = true
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[dependency-groups]
+dev = [
+    "bandit>=1.8.5",
+    "detect-secrets>=1.5.0",
+    "mypy>=1.16.1",
+    "pre-commit>=4.2.0",
+    "pydocstyle>=6.3.0",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.0.0",
+    "pytest-cov>=6.2.1",
+    "ruff>=0.12.2",
+    "safety>=3.5.2",
+]

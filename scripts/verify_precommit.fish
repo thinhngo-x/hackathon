@@ -4,6 +4,9 @@
 echo "🔍 Verifying pre-commit hooks setup..."
 echo "=" * 50
 
+# Change to backend directory
+cd backend
+
 # Check if pre-commit is installed
 if not command -v pre-commit > /dev/null
     echo "❌ pre-commit is not installed"
@@ -21,7 +24,7 @@ else
 end
 
 # Check if hooks are installed
-if not test -f .git/hooks/pre-commit
+if not test -f ../.git/hooks/pre-commit
     echo "❌ Git hooks not installed. Run: pre-commit install"
     exit 1
 else

@@ -4,7 +4,8 @@
 echo "🔍 Verifying VS Code Development Environment Setup..."
 echo "=" * 60
 
-# Check if VS Code configuration exists
+# Check if VS Code configuration exists in root directory
+cd ..
 if test -d .vscode
     echo "✅ .vscode directory found"
 
@@ -30,7 +31,8 @@ else
     echo "❌ Workspace file missing"
 end
 
-# Check Python virtual environment
+# Check backend directory and Python virtual environment
+cd backend
 if test -f .venv/bin/python
     echo "✅ Python virtual environment found"
     .venv/bin/python --version
@@ -50,6 +52,7 @@ for package in $packages
         echo "❌ $package not available"
     end
 end
+end
 
 echo ""
 echo "🎯 VS Code Setup Summary:"
@@ -62,10 +65,10 @@ echo "✅ Extension recommendations"
 echo "✅ Python environment integration"
 echo ""
 echo "📋 Next steps:"
-echo "1. Open VS Code: code ."
+echo "1. Open VS Code from project root: code ."
 echo "2. Or open workspace: code ticket-assistant.code-workspace"
 echo "3. Install recommended extensions when prompted"
-echo "4. Select Python interpreter (.venv/bin/python)"
+echo "4. Select Python interpreter (backend/.venv/bin/python)"
 echo "5. Use Ctrl+Shift+P → 'Tasks: Run Task' for development"
 echo ""
 echo "🚀 Ready for development in VS Code!"

@@ -11,8 +11,8 @@ if not command -v uv &> /dev/null
     exit 1
 end
 
-# Change to project directory
-cd /home/duthngo/hackathon
+# Change to backend directory
+cd backend
 
 # Install test dependencies
 echo "📦 Installing test dependencies..."

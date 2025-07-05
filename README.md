@@ -1,70 +1,128 @@
-# 🎫 Ticket Assistant API
+# 🎫 Ticket Assistant - AI-Powered Ticket Management System
 
-A professionally organized, AI-powered ticket reporting and classification system built with FastAPI and modern Python best practices.
+A professionally organized, AI-powered ticket reporting and classification system built with FastAPI backend and modern React frontend, optimized for deployment on Vultr cloud infrastructure.
+
+## 🏆 RAISE YOUR HACK - Hackathon Project
+
+**Track**: Vultr Track  
+**Focus**: Modern full-stack development with AI integration and cloud-native deployment
+
+### Key Features
+- 🤖 **AI-Powered Classification** using Groq API with Llama 3.1
+- ⚡ **Real-time Analysis** with instant feedback
+- 🎨 **Modern React Frontend** with TypeScript and Tailwind CSS
+- 🚀 **FastAPI Backend** with comprehensive testing
+- ☁️ **Vultr-Optimized Deployment** with Docker and Kubernetes support
 
 ## 🚀 Quick Start
 
+### Prerequisites
+- Python 3.9+ with [uv](https://docs.astral.sh/uv/) package manager
+- Node.js 18+ with npm
+- Docker (for deployment)
+
+### Development Setup
+
 ```bash
-# 1. Install uv (if not already installed)
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# 1. Install root dependencies
+npm install
 
-# 2. Install dependencies
-uv sync --dev
-
-# 3. Set up environment
+# 2. Set up backend environment
+cd backend
 cp .env.example .env
 # Edit .env and add your Groq API key
+uv sync --dev
 
-# 4. Run the server
+# 3. Run both frontend and backend
+cd ..
+npm run dev
+
+# Backend: http://localhost:8000/docs (API documentation)
+# Frontend: http://localhost:3000 (Coming soon!)
+```
+
+### Backend Only
+
+```bash
+cd backend
 uv run python main.py
+# Visit http://localhost:8000/docs for API documentation
+```
 
-# 5. Visit http://localhost:8000/docs for API documentation
+## 🏗️ Project Structure
+
+```
+ticket-assistant/
+├── backend/                    # FastAPI backend
+│   ├── src/ticket_assistant/   # Python source code
+│   ├── tests/                  # Backend tests (38 tests, 100% pass rate)
+│   └── main.py                 # Backend entry point
+├── frontend/                   # React frontend (in development)
+│   ├── src/                    # React source code
+│   └── vite.config.ts          # Vite configuration
+├── shared/                     # Shared types and constants
+│   ├── types/                  # TypeScript type definitions
+│   └── constants/              # Shared constants
+├── docker/                     # Docker configurations
+│   ├── Dockerfile.backend      # Backend container
+│   ├── Dockerfile.frontend     # Frontend container
+│   └── nginx.conf              # Nginx configuration
+├── docs/                       # Documentation
+│   ├── HACKATHON.md           # Hackathon project details
+│   ├── FRONTEND_ARCHITECTURE.md # Frontend architecture
+│   └── DEPLOYMENT.md           # Vultr deployment guide
+└── scripts/                    # Development scripts
 ```
 
 ## ✨ Features
 
 - **Report Submission**: Send structured reports with name, keywords, and descriptions to a ticket API endpoint
 - **AI Classification**: Use Groq API to automatically classify errors and route them to relevant departments
-- **Department Routing**: Automatic routing to backend, frontend, database, DevOps, security, API, integration, or general departments
-- **Severity Assessment**: Automatic severity classification (low, medium, high, critical)
+### Backend Features
+- **AI-Powered Classification**: Real-time analysis using Groq API with Llama 3.1
+- **Department Routing**: Automatic routing to 8 technical departments
+- **Severity Assessment**: 4-level severity classification (low, medium, high, critical)
 - **RESTful API**: Full FastAPI implementation with automatic documentation
-- **Comprehensive Testing**: Unit and integration tests with pytest (38 tests, 100% pass rate)
+- **Comprehensive Testing**: 38 tests with 100% pass rate and 76% coverage
 - **Fast Package Management**: Uses `uv` for lightning-fast dependency management
 - **Modern Python Structure**: Follows src/ layout best practices
 
-## 📁 Project Structure
+### Frontend Features (In Development)
+- **React 18 + Vite**: Lightning-fast development and build times
+- **TypeScript**: Full type safety with shared types
+- **Real-time Classification**: Live AI feedback as users type
+- **Modern UI**: Tailwind CSS with shadcn/ui components
+- **Responsive Design**: Mobile-first responsive design
+- **Interactive Dashboard**: Analytics and metrics visualization
 
+## 🚀 Deployment
+
+### Quick Deploy with Docker
+
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
+
+# Access the application
+# Frontend: http://localhost
+# Backend: http://localhost:8000
 ```
-ticket-assistant/
-├── src/                          # Source code
-│   └── ticket_assistant/
-│       ├── api/                  # API layer
-│       │   ├── main.py          # Main FastAPI app
-│       │   ├── health.py        # Health check endpoints
-│       │   ├── reports.py       # Report endpoints
-│       │   ├── classification.py # Classification endpoints
-│       │   └── combined.py      # Combined operations
-│       ├── core/                # Core functionality
-│       │   ├── models.py        # Pydantic models
-│       │   ├── config.py        # Configuration management
-│       │   └── utils.py         # Utility functions
-│       └── services/            # Business logic
-│           ├── report_service.py # Report handling
-│           └── groq_classifier.py # AI classification
-├── tests/                       # Test suite (100% passing)
-│   ├── unit/                    # Unit tests
-│   └── integration/             # Integration tests
-├── docs/                        # Documentation
-├── scripts/                     # Utility scripts
-├── examples/                    # Usage examples
-└── pyproject.toml              # Modern Python project configuration
-```
+
+### Vultr Cloud Deployment
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for comprehensive Vultr deployment guides including:
+- Single instance deployment
+- Kubernetes (VKE) deployment
+- Load balancer configuration
+- Performance optimization
 
 ## 📚 Documentation
 
+- **[Hackathon Details](docs/HACKATHON.md)** - Project concept and competition information
+- **[Frontend Architecture](docs/FRONTEND_ARCHITECTURE.md)** - React frontend design and implementation plan
+- **[Vultr Deployment Guide](docs/DEPLOYMENT.md)** - Complete cloud deployment instructions
 - **[API Documentation](docs/API.md)** - Complete API reference
 - **[Development Setup](docs/DEVELOPMENT.md)** - Development environment setup
-- **[Deployment Guide](docs/DEPLOYMENT.md)** - Production deployment instructions
 
 ## 🧪 Testing
 

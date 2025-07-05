@@ -4,9 +4,12 @@
 
 echo "🛡️  Running comprehensive security checks..."
 
-# Check if we're in the right directory
+# Change to backend directory
+cd backend
+
+# Check if we're in the backend directory
 if not test -f "pyproject.toml"
-    echo "❌ Not in the project root directory"
+    echo "❌ Not in the backend directory or pyproject.toml not found"
     exit 1
 end
 

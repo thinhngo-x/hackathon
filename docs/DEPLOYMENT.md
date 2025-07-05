@@ -1,10 +1,35 @@
-# 🚀 Deployment Guide
+# 🚀 Vultr Deployment Guide
 
-## Production Deployment
+## Vultr Cloud Deployment
 
-### Docker Deployment
+This guide covers deploying the Ticket Assistant application on Vultr's high-performance cloud infrastructure, optimized for the full-stack React + FastAPI architecture.
 
-#### 1. Create Dockerfile
+### Architecture Overview
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  Vultr Load     │    │  Frontend       │    │  Backend        │
+│  Balancer       │───▶│  (React + Vite) │───▶│  (FastAPI)      │
+│  (HAProxy)      │    │  Vultr Instance │    │  Vultr Instance │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  Vultr DNS      │    │  Vultr Block    │    │  Vultr Private  │
+│  Management     │    │  Storage        │    │  Network        │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### Prerequisites
+
+- Vultr account with API access
+- Docker installed locally
+- Domain name (optional, for custom DNS)
+
+## Docker Deployment
+
+### 1. Backend Dockerfile
 
 ```dockerfile
 FROM python:3.11-slim
@@ -35,41 +60,88 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 CMD ["uv", "run", "uvicorn", "ticket_assistant.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-#### 2. Build and Run
+### 2. Frontend Dockerfile
 
-```bash
-# Build image
-docker build -t ticket-assistant .
+```dockerfile
+FROM node:18-alpine AS builder
 
-# Run container
-docker run -p 8000:8000 --env-file .env ticket-assistant
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY frontend/package*.json ./frontend/
+
+# Install dependencies
+RUN npm ci
+
+# Copy source code
+COPY frontend/ ./frontend/
+COPY shared/ ./shared/
+
+# Build application
+WORKDIR /app/frontend
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine
+
+# Copy built files
+COPY --from=builder /app/frontend/dist /usr/share/nginx/html
+
+# Copy nginx configuration
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+
+# Expose port
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost/ || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]
 ```
 
-#### 3. Docker Compose
+### 3. Docker Compose Configuration
 
 ```yaml
+# docker-compose.yml
 version: '3.8'
 
 services:
-  ticket-assistant:
-    build: .
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: ../docker/Dockerfile.backend
     ports:
       - "8000:8000"
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
-      - TICKET_API_ENDPOINT=${TICKET_API_ENDPOINT}
       - API_HOST=0.0.0.0
       - API_PORT=8000
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 5s
+    networks:
+      - app-network
     restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    environment:
+      - REACT_APP_API_URL=http://backend:8000
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
 ```
 
-### Cloud Deployment
+## Cloud Deployment
 
 #### AWS ECS
 
@@ -370,4 +442,246 @@ ss -tulpn | grep :8000
 
 # Application metrics
 curl http://localhost:8000/metrics
+```
+
+## Vultr Deployment Options
+
+### Option 1: Vultr Compute Instances
+
+#### 1. Create Vultr Instance
+
+```bash
+# Create a high-performance compute instance
+vultr instance create \
+  --region "ewr" \
+  --plan "vc2-2c-4gb" \
+  --os "ubuntu-20.04" \
+  --label "ticket-assistant-app"
+```
+
+#### 2. Setup Script
+
+```bash
+#!/bin/bash
+# setup-vultr.sh
+
+# Update system
+apt update && apt upgrade -y
+
+# Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+
+# Install Docker Compose
+curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
+# Clone repository
+git clone https://github.com/your-username/ticket-assistant.git
+cd ticket-assistant
+
+# Set environment variables
+echo "GROQ_API_KEY=your_api_key_here" > .env
+
+# Start services
+docker-compose up -d
+
+# Setup SSL (optional)
+# certbot --nginx -d yourdomain.com
+```
+
+### Option 2: Vultr Kubernetes Engine (VKE)
+
+#### 1. Create Kubernetes Cluster
+
+```bash
+# Create VKE cluster
+vultr kubernetes create \
+  --cluster-name "ticket-assistant-cluster" \
+  --region "ewr" \
+  --version "v1.27.0" \
+  --node-pools='[{"node_quantity":2,"plan":"vc2-2c-4gb","label":"worker-nodes"}]'
+```
+
+#### 2. Kubernetes Manifests
+
+```yaml
+# k8s/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ticket-assistant
+
+---
+# k8s/backend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: ticket-assistant
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: your-registry/ticket-assistant-backend:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: GROQ_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: groq-api-key
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+
+---
+# k8s/frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: ticket-assistant
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: your-registry/ticket-assistant-frontend:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+```
+
+### Option 3: Vultr Load Balancer with Multiple Instances
+
+#### 1. Create Multiple Instances
+
+```bash
+# Create backend instances
+for i in {1..2}; do
+  vultr instance create \
+    --region "ewr" \
+    --plan "vc2-2c-4gb" \
+    --os "ubuntu-20.04" \
+    --label "ticket-assistant-backend-$i"
+done
+
+# Create frontend instances
+for i in {1..2}; do
+  vultr instance create \
+    --region "ewr" \
+    --plan "vc2-1c-2gb" \
+    --os "ubuntu-20.04" \
+    --label "ticket-assistant-frontend-$i"
+done
+```
+
+#### 2. Setup Load Balancer
+
+```bash
+# Create load balancer
+vultr load-balancer create \
+  --region "ewr" \
+  --label "ticket-assistant-lb" \
+  --forwarding-rules '[
+    {
+      "frontend_protocol": "HTTP",
+      "frontend_port": 80,
+      "backend_protocol": "HTTP",
+      "backend_port": 80
+    },
+    {
+      "frontend_protocol": "HTTP",
+      "frontend_port": 8000,
+      "backend_protocol": "HTTP",
+      "backend_port": 8000
+    }
+  ]'
+```
+
+## Performance Optimization for Vultr
+
+### 1. Instance Selection
+
+```bash
+# High-performance instances for production
+# Backend: vc2-4c-8gb or vc2-8c-16gb
+# Frontend: vc2-2c-4gb
+# Database: vc2-4c-8gb with SSD storage
+
+# Development/testing
+# Backend: vc2-2c-4gb
+# Frontend: vc2-1c-2gb
+```
+
+### 2. Network Optimization
+
+```bash
+# Create private network
+vultr network create \
+  --region "ewr" \
+  --description "ticket-assistant-network" \
+  --v4_subnet "10.0.0.0/24"
+
+# Attach instances to private network
+vultr instance attach-private-network \
+  --instance-id "your-instance-id" \
+  --network-id "your-network-id"
+```
+
+### 3. Storage Optimization
+
+```bash
+# Create block storage for persistent data
+vultr block-storage create \
+  --region "ewr" \
+  --size 100 \
+  --label "ticket-assistant-storage"
+
+# Attach to instance
+vultr instance attach-block-storage \
+  --instance-id "your-instance-id" \
+  --block-storage-id "your-storage-id"
+```
+
+### 4. Monitoring and Logging
+
+```bash
+# Install monitoring agent
+curl -s https://repo.vultr.com/setup.sh | bash
+apt install vultr-agent
+
+# Configure logging
+cat > /etc/rsyslog.d/50-vultr.conf << EOF
+*.*  @@logs.vultr.com:514
+EOF
+
+systemctl restart rsyslog
 ```

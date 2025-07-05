@@ -12,6 +12,9 @@ if ! command -v uv &> /dev/null; then
     exit 1
 fi
 
+# Change to backend directory
+cd backend
+
 # Create virtual environment if it doesn't exist
 if [ ! -d ".venv" ]; then
     echo "📦 Creating virtual environment..."

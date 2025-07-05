@@ -11,6 +11,9 @@ if ! command -v uv &> /dev/null; then
     exit 1
 fi
 
+# Change to backend directory
+cd backend
+
 # Install test dependencies
 echo "📦 Installing test dependencies..."
 uv pip install -r requirements.txt -r dev-requirements.txt

@@ -11,8 +11,8 @@ if not command -v uv &> /dev/null
     exit 1
 end
 
-# Change to project directory
-cd /home/duthngo/hackathon
+# Change to backend directory
+cd backend
 
 # Create virtual environment if it doesn't exist
 if not test -d ".venv"
@@ -50,6 +50,7 @@ echo "   ./scripts/lint.fish          # Run linting and formatting"
 echo "   ./scripts/security.fish      # Run security checks"
 echo ""
 echo "🎯 To run the application:"
+echo "   cd backend"
 echo "   source .venv/bin/activate.fish"
 echo "   set -x PYTHONPATH (pwd)/src"
 echo "   python src/ticket_assistant/api/main.py"
