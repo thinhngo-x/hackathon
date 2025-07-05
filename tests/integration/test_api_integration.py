@@ -1,8 +1,10 @@
 """Integration tests for the full API."""
 
-import pytest
 import sys
 from pathlib import Path
+from unittest.mock import AsyncMock
+
+import pytest
 from fastapi.testclient import TestClient
 
 # Add src to path for imports
@@ -10,7 +12,13 @@ root_dir = Path(__file__).parent.parent.parent
 src_dir = root_dir / "src"
 sys.path.insert(0, str(src_dir))
 
+# Import after path modification
+from ticket_assistant.api import classification
+from ticket_assistant.api import combined
+from ticket_assistant.api import reports
 from ticket_assistant.api.main import app
+from ticket_assistant.services.groq_classifier import GroqClassifier
+from ticket_assistant.services.report_service import ReportService
 
 
 class TestAPIIntegration:
@@ -18,8 +26,27 @@ class TestAPIIntegration:
 
     @pytest.fixture
     def client(self):
-        """Create a test client."""
-        return TestClient(app)
+        """Create a test client with initialized services."""
+        # Initialize test services
+        report_service = ReportService(api_endpoint="https://test-api.example.com/tickets")
+
+        # Set up mock Groq classifier
+        mock_groq_classifier = AsyncMock(spec=GroqClassifier)
+
+        # Set global service instances for the duration of the test
+        reports.report_service = report_service
+        combined.report_service = report_service
+        classification.groq_classifier = mock_groq_classifier
+        combined.groq_classifier = mock_groq_classifier
+
+        client = TestClient(app)
+        yield client
+
+        # Cleanup after test
+        reports.report_service = None
+        combined.report_service = None
+        classification.groq_classifier = None
+        combined.groq_classifier = None
 
     def test_root_endpoint(self, client):
         """Test the root endpoint."""
@@ -56,9 +83,9 @@ class TestAPIIntegration:
         report_data = {
             "name": "Integration Test Report",
             "keywords": ["test", "integration"],
-            "description": "This is an integration test report"
+            "description": "This is an integration test report",
         }
-        
+
         response = client.post("/reports/mock", json=report_data)
         assert response.status_code == 200
         data = response.json()
@@ -69,7 +96,7 @@ class TestAPIIntegration:
         """Test that API documentation is accessible."""
         response = client.get("/docs")
         assert response.status_code == 200
-        
+
         response = client.get("/redoc")
         assert response.status_code == 200
 

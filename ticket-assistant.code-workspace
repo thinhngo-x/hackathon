@@ -1,0 +1,32 @@
+{
+    "folders": [
+        {
+            "name": "Ticket Assistant",
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.associations": {
+            "*.py": "python",
+            "*.toml": "toml",
+            "*.yaml": "yaml",
+            "*.yml": "yaml"
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-python.python",
+            "ms-python.debugpy",
+            "ms-python.vscode-pylance",
+            "charliermarsh.ruff",
+            "ms-python.pytest",
+            "eamodio.gitlens",
+            "redhat.vscode-yaml",
+            "tamasfe.even-better-toml",
+            "elagil.pre-commit-helper",
+            "usernamehw.errorlens",
+            "humao.rest-client",
+            "bmalehorn.vscode-fish"
+        ]
+    }
+}

@@ -1,8 +1,9 @@
 """Pytest configuration and fixtures."""
 
-import pytest
 import sys
 from pathlib import Path
+
+import pytest
 
 # Add src directory to Python path for all tests
 root_dir = Path(__file__).parent.parent
@@ -16,7 +17,7 @@ def project_root():
     return root_dir
 
 
-@pytest.fixture(scope="session") 
+@pytest.fixture(scope="session")
 def src_dir():
     """Source directory fixture."""
     return root_dir / "src"

@@ -12,8 +12,8 @@ async def health_check():
         "status": "healthy",
         "services": {
             "report_service": True,  # Will be updated with actual service checks
-            "groq_classifier": True  # Will be updated with actual service checks
-        }
+            "groq_classifier": True,  # Will be updated with actual service checks
+        },
     }
 
 

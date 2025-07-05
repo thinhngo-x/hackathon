@@ -1,4 +1,4 @@
-.PHONY: help install install-dev run stop test test-unit test-integration clean lint format check docs
+.PHONY: help install install-dev run stop test test-unit test-integration clean lint format check docs security pre-commit
 
 # Default target
 help: ## Show this help message
@@ -12,6 +12,11 @@ install: ## Install production dependencies
 install-dev: ## Install development dependencies
 	uv venv
 	uv pip install -r requirements.txt -r dev-requirements.txt
+	pre-commit install
+
+setup: ## Full development setup
+	@chmod +x scripts/setup.fish
+	@./scripts/setup.fish
 
 run: ## Run the application
 	@chmod +x scripts/run.sh
@@ -27,6 +32,56 @@ test: ## Run all tests
 
 test-unit: ## Run unit tests only
 	source .venv/bin/activate && export PYTHONPATH="${PYTHONPATH}:$(pwd)/src" && pytest tests/unit/ -v
+
+test-integration: ## Run integration tests only
+	source .venv/bin/activate && export PYTHONPATH="${PYTHONPATH}:$(pwd)/src" && pytest tests/integration/ -v
+
+lint: ## Run linting and formatting
+	@chmod +x scripts/lint.fish
+	@./scripts/lint.fish
+
+security: ## Run security checks
+	@chmod +x scripts/security.fish
+	@./scripts/security.fish
+
+pre-commit: ## Run pre-commit hooks on all files
+	pre-commit run --all-files
+
+pre-commit-update: ## Update pre-commit hooks to latest versions
+	pre-commit autoupdate
+
+format: ## Format code with Ruff
+	source .venv/bin/activate && ruff format src/ tests/
+
+check: ## Run all quality checks
+	source .venv/bin/activate && ruff check src/ tests/
+	source .venv/bin/activate && mypy src/ --ignore-missing-imports
+	source .venv/bin/activate && bandit -r src/
+	source .venv/bin/activate && safety check -r requirements.txt
+
+clean: ## Clean up build artifacts and cache
+	rm -rf build/
+	rm -rf dist/
+	rm -rf *.egg-info
+	rm -rf __pycache__/
+	rm -rf .pytest_cache/
+	rm -rf .ruff_cache/
+	rm -rf .mypy_cache/
+	rm -rf htmlcov/
+	rm -rf .coverage
+	rm -rf bandit-report.json
+	rm -rf safety-report.json
+	find . -type f -name "*.pyc" -delete
+	find . -type d -name "__pycache__" -delete
+
+docs: ## Generate documentation
+	@echo "Documentation generation not yet implemented"
+
+# Development workflow targets
+dev-setup: install-dev ## Alias for install-dev
+dev-test: test ## Alias for test
+dev-lint: lint ## Alias for lint
+dev-security: security ## Alias for security
 
 test-integration: ## Run integration tests only
 	source .venv/bin/activate && export PYTHONPATH="${PYTHONPATH}:$(pwd)/src" && pytest tests/integration/ -v

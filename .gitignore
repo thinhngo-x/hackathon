@@ -173,3 +173,33 @@ Desktop.ini
 
 # UV specific
 uv.lock
+
+# Security reports
+bandit-report.json
+safety-report.json
+
+# Pre-commit
+.pre-commit-config.yaml.bak
+
+# Ruff cache
+.ruff_cache/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Log files
+*.log
+logs/
+
+# Local development
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Application specific
+uploads/
+downloads/
