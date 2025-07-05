@@ -22,10 +22,14 @@ class TicketAssistantClient:
             response.raise_for_status()
             return response.json()
 
-    async def classify_error(self, classification_data: dict[str, Any]) -> dict[str, Any]:
+    async def classify_error(
+        self, classification_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Classify an error (requires Groq API key)."""
         async with httpx.AsyncClient() as client:
-            response = await client.post(f"{self.base_url}/classify", json=classification_data, timeout=30.0)
+            response = await client.post(
+                f"{self.base_url}/classify", json=classification_data, timeout=30.0
+            )
             if response.status_code == 500:
                 print("⚠️  Groq API not available - skipping classification demo")
                 return {"error": "Groq API not available"}

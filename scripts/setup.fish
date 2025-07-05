@@ -4,6 +4,10 @@
 
 echo "🚀 Setting up Ticket Assistant Development Environment..."
 
+# Install Node.js dependencies for monorepo
+echo "📦 Installing Node.js dependencies..."
+npm install
+
 # Check if uv is installed
 if not command -v uv &> /dev/null
     echo "❌ uv is not installed. Please install it first:"
@@ -11,7 +15,8 @@ if not command -v uv &> /dev/null
     exit 1
 end
 
-# Change to backend directory
+# Set up Python backend
+echo "🐍 Setting up Python backend..."
 cd backend
 
 # Create virtual environment if it doesn't exist
@@ -21,7 +26,7 @@ if not test -d ".venv"
 end
 
 # Install dependencies
-echo "📦 Installing dependencies..."
+echo "📦 Installing Python dependencies..."
 uv pip install -r requirements.txt -r dev-requirements.txt
 
 # Set up environment
@@ -37,14 +42,15 @@ pre-commit install
 echo "🧪 Running pre-commit checks on all files..."
 pre-commit run --all-files
 
-# Initialize secrets detection baseline
-echo "🔍 Initializing secrets detection baseline..."
-detect-secrets scan --baseline .secrets.baseline
+# Go back to root directory
+cd ..
 
 echo ""
 echo "✅ Development environment setup complete!"
 echo ""
 echo "🎯 Available commands:"
+echo "   npm run dev                  # Run development servers (all services)"
+echo "   npm run backend              # Run backend only"
 echo "   ./scripts/test.fish          # Run tests"
 echo "   ./scripts/lint.fish          # Run linting and formatting"
 echo "   ./scripts/security.fish      # Run security checks"

@@ -4,7 +4,7 @@ A professionally organized, AI-powered ticket reporting and classification syste
 
 ## 🏆 RAISE YOUR HACK - Hackathon Project
 
-**Track**: Vultr Track  
+**Track**: Vultr Track
 **Focus**: Modern full-stack development with AI integration and cloud-native deployment
 
 ### Key Features

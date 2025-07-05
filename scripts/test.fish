@@ -14,6 +14,13 @@ end
 # Change to backend directory
 cd backend
 
+# Check if we're in the backend directory
+if not test -f "pyproject.toml"
+    echo "❌ Not in the backend directory or pyproject.toml not found"
+    cd ..
+    exit 1
+end
+
 # Install test dependencies
 echo "📦 Installing test dependencies..."
 uv pip install -r requirements.txt -r dev-requirements.txt
@@ -37,3 +44,6 @@ if test -f "htmlcov/index.html"
 end
 
 echo "✅ Tests completed!"
+
+# Return to root directory
+cd ..

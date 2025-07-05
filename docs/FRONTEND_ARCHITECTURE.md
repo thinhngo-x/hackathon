@@ -144,17 +144,17 @@ class TicketAssistantAPI {
     const response = await apiClient.post('/tickets', ticket);
     return response.data;
   }
-  
+
   async classifyError(description: string): Promise<ClassificationResult> {
     const response = await apiClient.post('/classify', { description });
     return response.data;
   }
-  
+
   async getTickets(filters: TicketFilters): Promise<TicketList> {
     const response = await apiClient.get('/tickets', { params: filters });
     return response.data;
   }
-  
+
   async getTicketById(id: string): Promise<TicketDetails> {
     const response = await apiClient.get(`/tickets/${id}`);
     return response.data;
@@ -370,14 +370,14 @@ export default defineConfig({
 # docker-compose.yml
 services:
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: ../docker/Dockerfile.backend
     ports:
       - "8000:8000"
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
-  
+
   frontend:
     build:
       context: ./frontend

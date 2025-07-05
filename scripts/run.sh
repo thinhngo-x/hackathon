@@ -15,6 +15,13 @@ fi
 # Change to backend directory
 cd backend
 
+# Check if we're in the backend directory
+if [ ! -f "pyproject.toml" ]; then
+    echo "❌ Not in the backend directory or pyproject.toml not found"
+    cd ..
+    exit 1
+fi
+
 # Create virtual environment if it doesn't exist
 if [ ! -d ".venv" ]; then
     echo "📦 Creating virtual environment..."

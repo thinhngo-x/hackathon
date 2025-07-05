@@ -109,7 +109,7 @@ version: '3.8'
 
 services:
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: ../docker/Dockerfile.backend
     ports:
