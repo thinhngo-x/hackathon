@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "AI-powered ticket reporting and classification system",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "shared"
-  ],
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && uv run python main.py",

@@ -425,12 +425,12 @@ CMD ["npm", "run", "preview"]
 ### Day 1: Foundation & Setup (8 hours)
 **Goal: Get the basic structure and UI foundation ready**
 - [x] Set up monorepo structure
-- [ ] Initialize React app with Vite and TypeScript (1h)
-- [ ] Set up Tailwind CSS and shadcn/ui components (1h)
-- [ ] Configure React Router and basic routing (1h)
-- [ ] Implement shared type definitions from backend (1h)
-- [ ] Create basic layout with header/sidebar navigation (2h)
-- [ ] Set up API client with Axios and TanStack Query (2h)
+- [x] Initialize React app with Vite and TypeScript (1h)
+- [x] Set up Tailwind CSS and shadcn/ui components (1h)
+- [x] Configure React Router and basic routing (1h)
+- [x] Implement shared type definitions from backend (1h)
+- [x] Create basic layout with header/sidebar navigation (2h)
+- [x] Set up API client with Axios and TanStack Query (2h)
 
 ### Day 2: Core UI & Ticket Submission (8 hours)
 **Goal: Build the main ticket submission flow with AI classification**
