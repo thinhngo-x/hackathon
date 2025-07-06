@@ -58,3 +58,13 @@ class TicketData(BaseModel):
     severity: ErrorSeverity
     status: str = "open"
     created_at: str
+
+
+class DashboardStats(BaseModel):
+    total_tickets: int
+    open_tickets: int
+    resolved_tickets: int
+    average_resolution_time: float  # in hours
+    classification_accuracy: float  # percentage (0-100)
+    department_distribution: dict[str, int]
+    severity_distribution: dict[str, int]

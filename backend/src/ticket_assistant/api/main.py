@@ -2,11 +2,16 @@ import logging
 import os
 from contextlib import asynccontextmanager
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+# Load environment variables from .env file
+load_dotenv()
+
 from ticket_assistant.api import classification
 from ticket_assistant.api import combined
+from ticket_assistant.api import dashboard
 from ticket_assistant.api import health
 from ticket_assistant.api import reports
 from ticket_assistant.services.groq_classifier import GroqClassifier
@@ -21,6 +26,11 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):  # noqa: ARG001
     # Startup
     logger.info("Starting up Ticket Assistant API...")
+
+    # Initialize database
+    from ticket_assistant.database.connection import init_db
+    await init_db()
+    logger.info("Database initialized")
 
     # Initialize services
     api_endpoint = os.getenv("TICKET_API_ENDPOINT", "https://api.example.com/tickets")
@@ -47,6 +57,8 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
 
     # Shutdown
     logger.info("Shutting down Ticket Assistant API...")
+    from ticket_assistant.database.connection import close_db
+    await close_db()
 
 
 # Create FastAPI app
@@ -71,6 +83,7 @@ app.include_router(health.router)
 app.include_router(reports.router)
 app.include_router(classification.router)
 app.include_router(combined.router)
+app.include_router(dashboard.router)
 
 
 @app.get("/")

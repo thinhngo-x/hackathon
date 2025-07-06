@@ -42,7 +42,9 @@ const TicketSubmission: React.FC = () => {
   const submitMutation = useMutation({
     mutationFn: async (data: TicketSubmissionForm) => {
       const keywords = data.description.split(' ').filter(word => word.length > 3);
-      return await ticketAssistantAPI.submitTicket({
+      
+      // Use the new combined endpoint that classifies and creates ticket in database
+      return await ticketAssistantAPI.submitTicketWithClassificationMock({
         name: data.name,
         description: data.description,
         error_message: data.error_message,
@@ -52,13 +54,26 @@ const TicketSubmission: React.FC = () => {
     },
     onSuccess: (response) => {
       setIsSubmitted(true);
+      
+      // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
-      success('Ticket Submitted Successfully!', response.ticket_id ? `Your ticket has been created with ID: ${response.ticket_id}` : 'Your ticket has been successfully submitted');
+      
+      // Trigger custom event for dashboard real-time updates
+      window.dispatchEvent(new CustomEvent('ticketCreated', { 
+        detail: { ticket: response.ticket, classification: response.classification } 
+      }));
+      
+      // Show success toast with ticket details
+      success(
+        'Ticket Created Successfully!', 
+        `Ticket "${response.ticket.name}" created with ID: ${response.ticket.id}. Classified as ${response.classification.department.toUpperCase()} (${response.classification.severity.toUpperCase()})`
+      );
+      
       reset();
     },
     onError: (err) => {
-      error('Failed to Submit Ticket', err instanceof Error ? err.message : 'An unexpected error occurred');
+      error('Failed to Create Ticket', err instanceof Error ? err.message : 'An unexpected error occurred');
     }
   });
 
