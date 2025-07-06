@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import './App.css';
 
 function App() {
@@ -20,12 +20,12 @@ function App() {
               <div className="flex flex-shrink-0 items-center">
                 <h1 className="text-xl font-bold text-gray-900">Ticket Assistant</h1>
               </div>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+              <div className="ml-6 flex space-x-4 sm:space-x-8">
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium ${
+                    className={`inline-flex items-center border-b-2 px-1 pt-1 text-xs sm:text-sm font-medium ${
                       item.current
                         ? 'border-blue-500 text-gray-900'
                         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
