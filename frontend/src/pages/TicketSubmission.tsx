@@ -58,22 +58,11 @@ const TicketSubmission: React.FC = () => {
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
-      
-      // Trigger custom event for dashboard real-time updates
-      window.dispatchEvent(new CustomEvent('ticketCreated', { 
-        detail: { ticket: response.ticket, classification: response.classification } 
-      }));
-      
-      // Show success toast with ticket details
-      success(
-        'Ticket Created Successfully!', 
-        `Ticket "${response.ticket.name}" created with ID: ${response.ticket.id}. Classified as ${response.classification.department.toUpperCase()} (${response.classification.severity.toUpperCase()})`
-      );
-      
+      success('Ticket Submitted Successfully!', response.ticket_id ? `Your ticket has been created with ID: ${response.ticket_id}` : 'Your ticket has been successfully submitted');
       reset();
     },
     onError: (err) => {
-      error('Failed to Create Ticket', err instanceof Error ? err.message : 'An unexpected error occurred');
+      error('Failed to Submit Ticket', err instanceof Error ? err.message : 'An unexpected error occurred');
     }
   });
 
