@@ -7,10 +7,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from ticket_assistant.api import classification
+from ticket_assistant.api import classifications
 from ticket_assistant.api import combined
 from ticket_assistant.api import dashboard
 from ticket_assistant.api import health
 from ticket_assistant.api import reports
+from ticket_assistant.api import tickets
 from ticket_assistant.services.groq_classifier import GroqClassifier
 from ticket_assistant.services.report_service import ReportService
 
@@ -84,8 +86,10 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(reports.router)
 app.include_router(classification.router)
+app.include_router(classifications.router)
 app.include_router(combined.router)
 app.include_router(dashboard.router)
+app.include_router(tickets.router)
 
 
 @app.get("/")

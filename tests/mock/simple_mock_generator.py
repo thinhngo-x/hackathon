@@ -7,8 +7,8 @@ This script generates mock tickets by hitting the API endpoints.
 import json
 import random
 import time
-import urllib.request
 import urllib.parse
+import urllib.request
 from typing import Dict
 
 # Configuration
