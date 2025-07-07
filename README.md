@@ -25,6 +25,7 @@ A professionally organized, AI-powered ticket reporting and classification syste
 
 ```bash
 # 1. Install root dependencies
+cd frontend
 npm install
 
 # 2. Set up backend environment
@@ -34,7 +35,7 @@ cp .env.example .env
 uv sync --dev
 
 # 3. Run both frontend and backend
-cd ..
+cd ../frontend
 npm run dev
 
 # Backend: http://localhost:8000/docs (API documentation)
@@ -45,7 +46,7 @@ npm run dev
 
 ```bash
 cd backend
-uv run python main.py
+uv run python src/ticket_assistant/api/main.py
 # Visit http://localhost:8000/docs for API documentation
 ```
 

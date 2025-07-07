@@ -2,17 +2,16 @@
 
 import logging
 
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from ticket_assistant.core.models import ClassificationRequest
-from ticket_assistant.core.models import ClassificationResponse
+from ticket_assistant.core.models import ClassificationRequest, ClassificationResponse
+from ticket_assistant.database.connection import get_db
 from ticket_assistant.services.groq_classifier import GroqClassifier
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/classify", tags=["Classification"])
+router = APIRouter(prefix="/api/classification", tags=["Classification"])
 
 # Global service instance
 groq_classifier = None

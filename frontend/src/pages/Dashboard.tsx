@@ -27,12 +27,33 @@ import {
 import { ticketAssistantAPI } from '../lib/api/client';
 
 const Dashboard: React.FC = () => {
-  const { data: stats, isLoading, error } = useQuery({
+  const { data: stats, isLoading, error, refetch } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: () => ticketAssistantAPI.getDashboardStats(),
-    staleTime: 30000, // 30 seconds
-    refetchInterval: 60000, // 1 minute
+    staleTime: 10000, // 10 seconds - shorter for more responsive updates
+    refetchInterval: 30000, // 30 seconds - more frequent updates
+    refetchOnWindowFocus: true, // Refetch when user returns to window
   });
+
+  // Function to manually refresh stats (can be called when new tickets are created)
+  const refreshStats = () => {
+    refetch();
+  };
+
+  // Listen for custom events when tickets are created
+  React.useEffect(() => {
+    const handleTicketCreated = () => {
+      console.log('New ticket created, refreshing dashboard stats...');
+      refreshStats();
+    };
+
+    // Listen for custom ticket creation events
+    window.addEventListener('ticketCreated', handleTicketCreated);
+    
+    return () => {
+      window.removeEventListener('ticketCreated', handleTicketCreated);
+    };
+  }, [refetch]);
 
   // Mock data for charts when API is not available
   const departmentData = [

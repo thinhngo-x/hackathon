@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Data Generator - Ticket Assistant</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            height: 400px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        .stats {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Ticket Assistant - Mock Data Generator</h1>
+    
+    <div class="container">
+        <h2>Generate Mock Tickets</h2>
+        <p>This tool creates mock tickets using the API endpoints to populate the database.</p>
+        
+        <div>
+            <button class="button" onclick="createMockTickets(5)">Create 5 Tickets</button>
+            <button class="button" onclick="createMockTickets(10)">Create 10 Tickets</button>
+            <button class="button" onclick="createMockTickets(25)">Create 25 Tickets</button>
+            <button class="button" onclick="createMockTickets(50)">Create 50 Tickets</button>
+        </div>
+        
+        <div>
+            <button class="button" onclick="createSingleTicket()">Create 1 Test Ticket</button>
+            <button class="button" onclick="checkApiStatus()">Check API Status</button>
+            <button class="button" onclick="getDashboardStats()">Get Dashboard Stats</button>
+            <button class="button" onclick="clearLog()">Clear Log</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h3>Console Output</h3>
+        <div id="log" class="log"></div>
+    </div>
+
+    <div class="container">
+        <h3>Dashboard Statistics</h3>
+        <div id="stats" class="stats">
+            <em>Click "Get Dashboard Stats" to view current statistics</em>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+        
+        // Mock ticket templates
+        const TICKET_TEMPLATES = [
+            {
+                name: "Authentication service failing",
+                description: "Users cannot authenticate due to service errors and timeout issues",
+                error_message: "AuthenticationException: Token validation failed",
+                keywords: ["auth", "service", "timeout", "validation"]
+            },
+            {
+                name: "React component not rendering",
+                description: "Dashboard components fail to render after latest deployment",
+                error_message: "TypeError: Cannot read properties of undefined (reading 'map')",
+                keywords: ["react", "component", "rendering", "frontend"]
+            },
+            {
+                name: "Database performance issues", 
+                description: "Query execution times have increased significantly during peak hours",
+                error_message: "QueryTimeoutException: Execution time exceeded 5000ms",
+                keywords: ["database", "performance", "query", "timeout"]
+            },
+            {
+                name: "API gateway errors",
+                description: "502 Bad Gateway errors occurring intermittently on user endpoints",
+                error_message: "502 Bad Gateway: upstream server connection failed", 
+                keywords: ["api", "gateway", "502", "server"]
+            },
+            {
+                name: "File upload failures",
+                description: "Large file uploads are failing without proper error handling",
+                error_message: "PayloadTooLargeError: Maximum file size exceeded",
+                keywords: ["upload", "file", "size", "error"]
+            },
+            {
+                name: "Cache invalidation problems",
+                description: "User data not updating in real-time due to cache issues", 
+                error_message: "RedisConnectionException: Unable to connect to cache server",
+                keywords: ["cache", "redis", "invalidation", "data"]
+            },
+            {
+                name: "Mobile push notification failures",
+                description: "Push notifications not being delivered to mobile devices",
+                error_message: "FCM Error: Invalid registration token provided",
+                keywords: ["mobile", "push", "notifications", "fcm"]
+            },
+            {
+                name: "SSL certificate warnings",
+                description: "HTTPS connections showing certificate validation warnings",
+                error_message: "SSL Error: Certificate verification failed for api.example.com",
+                keywords: ["ssl", "certificate", "https", "security"]
+            }
+        ];
+
+        function log(message, type = 'info') {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            logElement.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        function generateRandomTicket() {
+            const template = TICKET_TEMPLATES[Math.floor(Math.random() * TICKET_TEMPLATES.length)];
+            const ticketNumber = Math.floor(Math.random() * 1000) + 1;
+            
+            return {
+                name: `${template.name} #${ticketNumber}`,
+                description: template.description,
+                error_message: template.error_message,
+                keywords: [...template.keywords, `issue-${ticketNumber}`],
+                screenshot_url: Math.random() < 0.2 ? `https://example.com/screenshots/issue-${ticketNumber}.png` : null
+            };
+        }
+
+        async function apiRequest(endpoint, method = 'GET', data = null) {
+            try {
+                const config = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                if (data) {
+                    config.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                throw new Error(`API request failed: ${error.message}`);
+            }
+        }
+
+        async function checkApiStatus() {
+            log('🔍 Checking API status...');
+            try {
+                const result = await apiRequest('/health');
+                log('✅ API is running and healthy!', 'success');
+                return true;
+            } catch (error) {
+                log(`❌ API not available: ${error.message}`, 'error');
+                log('💡 Make sure the backend server is running:', 'info');
+                log('   cd backend && python -m uvicorn src.ticket_assistant.api.main:app --reload', 'info');
+                return false;
+            }
+        }
+
+        async function getDashboardStats() {
+            log('📊 Fetching dashboard statistics...');
+            try {
+                const stats = await apiRequest('/api/dashboard/stats');
+                
+                const statsHtml = `
+                    <h4>Current Database Status</h4>
+                    <p><strong>Total Tickets:</strong> ${stats.total_tickets}</p>
+                    <p><strong>Open Tickets:</strong> ${stats.open_tickets}</p>
+                    <p><strong>Resolved Tickets:</strong> ${stats.resolved_tickets}</p>
+                    <p><strong>Average Resolution Time:</strong> ${stats.average_resolution_time} hours</p>
+                    <p><strong>Classification Accuracy:</strong> ${stats.classification_accuracy}%</p>
+                    
+                    <h5>Department Distribution</h5>
+                    ${Object.entries(stats.department_distribution).map(([dept, count]) => 
+                        `<span style="display: inline-block; margin: 2px; padding: 2px 8px; background: #007bff; color: white; border-radius: 3px; font-size: 12px;">${dept.toUpperCase()}: ${count}</span>`
+                    ).join('')}
+                    
+                    <h5>Severity Distribution</h5>
+                    ${Object.entries(stats.severity_distribution).map(([severity, count]) => 
+                        `<span style="display: inline-block; margin: 2px; padding: 2px 8px; background: #dc3545; color: white; border-radius: 3px; font-size: 12px;">${severity.toUpperCase()}: ${count}</span>`
+                    ).join('')}
+                `;
+                
+                document.getElementById('stats').innerHTML = statsHtml;
+                log('✅ Dashboard statistics updated!', 'success');
+                
+            } catch (error) {
+                log(`❌ Failed to get dashboard stats: ${error.message}`, 'error');
+            }
+        }
+
+        async function createSingleTicket() {
+            const ticketData = generateRandomTicket();
+            log(`🎫 Creating test ticket: ${ticketData.name}`);
+            
+            try {
+                const result = await apiRequest('/api/combined/classify-and-create-ticket-mock', 'POST', ticketData);
+                
+                if (result.success) {
+                    const ticket = result.ticket;
+                    const classification = result.classification;
+                    log(`✅ Created ticket ${ticket.id} [${classification.department.toUpperCase()}/${classification.severity.toUpperCase()}]`, 'success');
+                } else {
+                    log('❌ Failed to create ticket', 'error');
+                }
+                
+                // Auto-refresh stats
+                setTimeout(getDashboardStats, 500);
+                
+            } catch (error) {
+                log(`❌ Error creating ticket: ${error.message}`, 'error');
+            }
+        }
+
+        async function createMockTickets(count) {
+            // Disable buttons during generation
+            const buttons = document.querySelectorAll('.button');
+            buttons.forEach(btn => btn.disabled = true);
+            
+            log(`🚀 Starting creation of ${count} mock tickets...`);
+            
+            // Check API first
+            const apiOk = await checkApiStatus();
+            if (!apiOk) {
+                buttons.forEach(btn => btn.disabled = false);
+                return;
+            }
+            
+            let successful = 0;
+            let failed = 0;
+            
+            for (let i = 0; i < count; i++) {
+                const ticketData = generateRandomTicket();
+                log(`📝 Creating ticket ${i + 1}/${count}: ${ticketData.name.substring(0, 40)}...`);
+                
+                try {
+                    const result = await apiRequest('/api/combined/classify-and-create-ticket-mock', 'POST', ticketData);
+                    
+                    if (result.success) {
+                        successful++;
+                        const ticket = result.ticket;
+                        const classification = result.classification;
+                        log(`   ✅ ${ticket.id.substring(0, 8)} [${classification.department.toUpperCase()}/${classification.severity.toUpperCase()}]`, 'success');
+                    } else {
+                        failed++;
+                        log('   ❌ Creation failed', 'error');
+                    }
+                } catch (error) {
+                    failed++;
+                    log(`   ❌ Error: ${error.message}`, 'error');
+                }
+                
+                // Small delay between requests
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            log(`\n🎉 Mock data generation complete!`, 'success');
+            log(`✅ Successfully created: ${successful} tickets`, 'success');
+            if (failed > 0) {
+                log(`❌ Failed to create: ${failed} tickets`, 'error');
+            }
+            
+            // Re-enable buttons
+            buttons.forEach(btn => btn.disabled = false);
+            
+            // Auto-refresh stats
+            setTimeout(getDashboardStats, 1000);
+        }
+
+        // Initial setup
+        window.addEventListener('load', () => {
+            log('🎯 Mock Data Generator loaded!');
+            log('💡 Click buttons above to generate mock tickets');
+            checkApiStatus();
+        });
+    </script>
+</body>
+</html>
