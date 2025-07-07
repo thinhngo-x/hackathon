@@ -1,19 +1,20 @@
-import type { Department, ErrorSeverity, Ticket, TicketStatus } from '@shared/types/ticket';
+import type { TicketResponse } from '@shared/types/api';
+import type { Department, ErrorSeverity, TicketStatus } from '@shared/types/ticket';
 import { useQuery } from '@tanstack/react-query';
 import {
-    AlertCircle,
-    Calendar,
-    CheckCircle,
-    Clock,
-    Eye,
-    Filter,
-    Search,
-    SortAsc, SortDesc,
-    XCircle
+  AlertCircle,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Eye,
+  Filter,
+  Search,
+  SortAsc, SortDesc,
+  XCircle
 } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ticketAssistantAPI } from '../lib/api/client';
+import { ticketAssistantAPI } from '../lib/api';
 import { useToastContext } from '../lib/contexts/ToastContext';
 import { departmentOptions, severityOptions } from '../lib/schemas/ticketSchema';
 
@@ -24,86 +25,35 @@ const TicketList: React.FC = () => {
   const [severityFilter, setSeverityFilter] = useState<ErrorSeverity | ''>('');
   const [sortBy, setSortBy] = useState<'created_at' | 'updated_at' | 'severity'>('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [page, setPage] = useState(1);
+  const [perPage] = useState(10);
   const { info } = useToastContext();
 
-  const { data: tickets, isLoading, error } = useQuery<Ticket[]>({
-    queryKey: ['tickets'],
-    queryFn: () => ticketAssistantAPI.getTickets(),
+  const { data: ticketData, isLoading, error } = useQuery({
+    queryKey: ['tickets', page, perPage, statusFilter, departmentFilter, severityFilter],
+    queryFn: () => ticketAssistantAPI.getTickets({
+      page,
+      per_page: perPage,
+      status: statusFilter || undefined,
+      department: departmentFilter || undefined,
+      severity: severityFilter || undefined,
+    }),
     staleTime: 30000,
   });
 
-  // Mock data for development
-  const mockTickets: Ticket[] = [
-    {
-      id: 'TK-001',
-      name: 'John Doe',
-      description: 'Unable to login to dashboard after entering correct credentials',
-      keywords: ['login', 'authentication', 'dashboard'],
-      department: 'backend' as Department,
-      severity: 'high' as ErrorSeverity,
-      status: 'open' as TicketStatus,
-      created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      updated_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-      assignee: 'Alice Johnson'
-    },
-    {
-      id: 'TK-002',
-      name: 'Jane Smith',
-      description: 'Intermittent network connectivity issues affecting productivity',
-      keywords: ['network', 'connectivity', 'intermittent'],
-      department: 'devops' as Department,
-      severity: 'medium' as ErrorSeverity,
-      status: 'in_progress' as TicketStatus,
-      created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-      updated_at: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-      assignee: 'Bob Wilson'
-    },
-    {
-      id: 'TK-003',
-      name: 'Mike Johnson',
-      description: 'Database query performance is extremely slow',
-      keywords: ['database', 'performance', 'query'],
-      department: 'database' as Department,
-      severity: 'critical' as ErrorSeverity,
-      status: 'resolved' as TicketStatus,
-      created_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-      updated_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-      assignee: 'Carol Davis'
-    },
-    {
-      id: 'TK-004',
-      name: 'Sarah Brown',
-      description: 'Frontend component not rendering correctly on mobile devices',
-      keywords: ['frontend', 'mobile', 'rendering'],
-      department: 'frontend' as Department,
-      severity: 'low' as ErrorSeverity,
-      status: 'pending' as TicketStatus,
-      created_at: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-      updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-      id: 'TK-005',
-      name: 'David Lee',
-      description: 'Security vulnerability found in user authentication system',
-      keywords: ['security', 'vulnerability', 'authentication'],
-      department: 'security' as Department,
-      severity: 'critical' as ErrorSeverity,
-      status: 'open' as TicketStatus,
-      created_at: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-      updated_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-      assignee: 'Eve Martinez'
-    }
-  ];
 
-  const displayTickets = tickets || mockTickets;
+  const totalTickets = ticketData?.total || 0;
+  const hasNextPage = ticketData?.has_next || false;
+  const hasPrevPage = ticketData?.has_prev || false;
 
   const filteredAndSortedTickets = useMemo(() => {
-    const filtered = displayTickets.filter(ticket => {
+    const currentTickets = ticketData?.tickets || [];
+    const filtered = currentTickets.filter(ticket => {
       const matchesSearch = searchTerm === '' ||
                            ticket.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            ticket.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            ticket.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           ticket.keywords.some(keyword => keyword.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                           ticket.keywords.some((keyword: string) => keyword.toLowerCase().includes(searchTerm.toLowerCase())) ||
                            (ticket.assignee && ticket.assignee.toLowerCase().includes(searchTerm.toLowerCase()));
 
       const matchesStatus = !statusFilter || ticket.status === statusFilter;
@@ -114,7 +64,7 @@ const TicketList: React.FC = () => {
     });
 
     // Sort tickets
-    filtered.sort((a, b) => {
+    filtered.sort((a: TicketResponse, b: TicketResponse) => {
       let aValue: string | number;
       let bValue: string | number;
 
@@ -145,7 +95,7 @@ const TicketList: React.FC = () => {
     });
 
     return filtered;
-  }, [displayTickets, searchTerm, statusFilter, departmentFilter, severityFilter, sortBy, sortOrder]);
+  }, [ticketData?.tickets, searchTerm, statusFilter, departmentFilter, severityFilter, sortBy, sortOrder]);
 
   const getStatusIcon = (status: TicketStatus) => {
     switch (status) {
@@ -258,7 +208,7 @@ const TicketList: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-foreground">All Tickets</h1>
         <div className="text-sm text-muted-foreground">
-          Showing {filteredAndSortedTickets.length} of {displayTickets.length} tickets
+          Showing {filteredAndSortedTickets.length} of {totalTickets} tickets
         </div>
       </div>
 
@@ -450,6 +400,31 @@ const TicketList: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalTickets > 0 && (
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            Page {page} of {Math.ceil(totalTickets / perPage)} • {totalTickets} total tickets
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage(page - 1)}
+              disabled={!hasPrevPage}
+              className="px-3 py-1 rounded border border-border bg-background text-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setPage(page + 1)}
+              disabled={!hasNextPage}
+              className="px-3 py-1 rounded border border-border bg-background text-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

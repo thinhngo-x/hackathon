@@ -1,5 +1,5 @@
 // Test API connectivity
-import { ticketAssistantAPI } from './lib/api/client';
+import { ticketAssistantAPI } from './lib/api';
 
 // Test the API client
 async function testAPI() {

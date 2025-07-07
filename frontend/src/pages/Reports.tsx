@@ -9,8 +9,7 @@ import {
   RefreshCw,
   Target,
   TrendingUp,
-  Users,
-  XCircle
+  Users
 } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -41,7 +40,7 @@ interface ReportData {
 
 const Reports: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('7d');
-  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  // const [selectedDepartment, setSelectedDepartment] = useState('all');
 
   // Mock data - in a real app, this would come from an API
   const reportData: ReportData = {
@@ -72,6 +71,7 @@ const Reports: React.FC = () => {
     aiAccuracy: 94.5,
   };
 
+  /*
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'resolved':
@@ -82,6 +82,7 @@ const Reports: React.FC = () => {
         return <XCircle className="w-5 h-5 text-gray-500" />;
     }
   };
+  */
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

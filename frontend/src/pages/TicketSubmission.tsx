@@ -10,7 +10,7 @@ import { AlertCircle, CheckCircle, Send, Upload } from 'lucide-react';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ClassificationPreview } from '../components/ClassificationPreview';
-import { ticketAssistantAPI } from '../lib/api/client';
+import { ticketAssistantAPI } from '../lib/api';
 import { useToastContext } from '../lib/contexts/ToastContext';
 import { useClassification } from '../lib/hooks/useClassification';
 import { ticketSubmissionSchema, type TicketSubmissionForm } from '../lib/schemas/ticketSchema';
@@ -41,14 +41,12 @@ const TicketSubmission: React.FC = () => {
 
   const submitMutation = useMutation({
     mutationFn: async (data: TicketSubmissionForm) => {
-      const keywords = data.description.split(' ').filter(word => word.length > 3);
-
-      // Use the new combined endpoint that classifies and creates ticket in database
-      return await ticketAssistantAPI.submitTicketWithClassificationMock({
+      // Use the combined endpoint that classifies and creates ticket in database
+      return await ticketAssistantAPI.classifyAndCreateTicket({
         name: data.name,
         description: data.description,
+        keywords: data.title.split(' ').filter(word => word.length > 2), // Generate keywords from title
         error_message: data.error_message,
-        keywords,
         screenshot_url: data.screenshot_url
       });
     },
@@ -58,7 +56,7 @@ const TicketSubmission: React.FC = () => {
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
-      success('Ticket Submitted Successfully!', response.ticket_id ? `Your ticket has been created with ID: ${response.ticket_id}` : 'Your ticket has been successfully submitted');
+      success('Ticket Submitted Successfully!', response.ticket ? `Your ticket has been created with ID: ${response.ticket.id}` : 'Your ticket has been successfully submitted');
       reset();
     },
     onError: (err) => {

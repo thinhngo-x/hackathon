@@ -24,7 +24,7 @@ import {
   Tooltip,
   XAxis, YAxis
 } from 'recharts';
-import { ticketAssistantAPI } from '../lib/api/client';
+import { ticketAssistantAPI } from '../lib/api';
 
 const Dashboard: React.FC = () => {
   const { data: stats, isLoading, error, refetch } = useQuery({

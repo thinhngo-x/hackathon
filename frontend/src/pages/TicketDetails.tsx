@@ -17,7 +17,7 @@ import {
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ErrorBoundary } from '../components/ErrorBoundary';
-import { ticketAssistantAPI } from '../lib/api/client';
+import { ticketAssistantAPI } from '../lib/api';
 import { useToastContext } from '../lib/contexts/ToastContext';
 import { departmentOptions, severityOptions } from '../lib/schemas/ticketSchema';
 
