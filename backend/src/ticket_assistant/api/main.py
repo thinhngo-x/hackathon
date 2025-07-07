@@ -6,9 +6,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Load environment variables from .env file
-load_dotenv()
-
 from ticket_assistant.api import classification
 from ticket_assistant.api import combined
 from ticket_assistant.api import dashboard
@@ -16,6 +13,9 @@ from ticket_assistant.api import health
 from ticket_assistant.api import reports
 from ticket_assistant.services.groq_classifier import GroqClassifier
 from ticket_assistant.services.report_service import ReportService
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,6 +29,7 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
 
     # Initialize database
     from ticket_assistant.database.connection import init_db
+
     await init_db()
     logger.info("Database initialized")
 
@@ -58,6 +59,7 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
     # Shutdown
     logger.info("Shutting down Ticket Assistant API...")
     from ticket_assistant.database.connection import close_db
+
     await close_db()
 
 

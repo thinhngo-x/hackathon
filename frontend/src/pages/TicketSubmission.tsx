@@ -42,7 +42,7 @@ const TicketSubmission: React.FC = () => {
   const submitMutation = useMutation({
     mutationFn: async (data: TicketSubmissionForm) => {
       const keywords = data.description.split(' ').filter(word => word.length > 3);
-      
+
       // Use the new combined endpoint that classifies and creates ticket in database
       return await ticketAssistantAPI.submitTicketWithClassificationMock({
         name: data.name,
@@ -54,7 +54,7 @@ const TicketSubmission: React.FC = () => {
     },
     onSuccess: (response) => {
       setIsSubmitted(true);
-      
+
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });

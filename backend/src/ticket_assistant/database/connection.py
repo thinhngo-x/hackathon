@@ -1,9 +1,12 @@
 """Database connection and session management."""
 
-import os
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase
 import logging
+import os
+
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import DeclarativeBase
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +30,7 @@ AsyncSessionLocal = async_sessionmaker(
 
 class Base(DeclarativeBase):
     """Base class for all database models."""
+
     pass
 
 
@@ -46,7 +50,6 @@ async def init_db():
     """Initialize database tables."""
     async with engine.begin() as conn:
         # Import all models to ensure they are registered
-        from ticket_assistant.database.models import Ticket, Classification
         await conn.run_sync(Base.metadata.create_all)
         logger.info("Database tables created successfully")
 

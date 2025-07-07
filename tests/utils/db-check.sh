@@ -47,7 +47,7 @@ cd "$BACKEND_DIR"
 check_database_file() {
     echo
     print_status "info" "Checking database file..."
-    
+
     if [ -f "ticket_assistant.db" ]; then
         size=$(ls -lh ticket_assistant.db | awk '{print $5}')
         print_status "success" "Database file exists (Size: $size)"
@@ -63,7 +63,7 @@ check_database_file() {
 check_python_env() {
     echo
     print_status "info" "Checking Python environment..."
-    
+
     if command -v python3 &> /dev/null; then
         python_version=$(python3 --version)
         print_status "success" "Python available: $python_version"
@@ -71,7 +71,7 @@ check_python_env() {
         print_status "error" "Python3 not found"
         return 1
     fi
-    
+
     # Check if required packages are available
     if python3 -c "import sqlite3" 2>/dev/null; then
         print_status "success" "SQLite3 module available"
@@ -85,7 +85,7 @@ check_python_env() {
 run_health_check() {
     echo
     print_status "info" "Running comprehensive database health check..."
-    
+
     if [ -f "check_database_simple.py" ]; then
         python3 check_database_simple.py
     else
@@ -98,7 +98,7 @@ run_health_check() {
 check_api_health() {
     echo
     print_status "info" "Checking API health..."
-    
+
     if command -v curl &> /dev/null; then
         response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/health 2>/dev/null)
         if [ "$response" = "200" ]; then
@@ -116,24 +116,24 @@ check_api_health() {
 quick_stats() {
     echo
     print_status "info" "Quick database statistics..."
-    
+
     if [ -f "ticket_assistant.db" ]; then
         echo "📊 Database Statistics:"
-        
+
         # Count tickets
         ticket_count=$(sqlite3 ticket_assistant.db "SELECT COUNT(*) FROM tickets;" 2>/dev/null || echo "0")
         echo "   Total tickets: $ticket_count"
-        
+
         # Count classifications
         class_count=$(sqlite3 ticket_assistant.db "SELECT COUNT(*) FROM classifications;" 2>/dev/null || echo "0")
         echo "   Total classifications: $class_count"
-        
+
         # Show departments
         echo "   Departments:"
         sqlite3 ticket_assistant.db "SELECT department, COUNT(*) FROM tickets GROUP BY department;" 2>/dev/null | while read line; do
             echo "      $line"
         done
-        
+
         # Show status distribution
         echo "   Status distribution:"
         sqlite3 ticket_assistant.db "SELECT status, COUNT(*) FROM tickets GROUP BY status;" 2>/dev/null | while read line; do
@@ -148,7 +148,7 @@ quick_stats() {
 create_test_data() {
     echo
     print_status "info" "Creating test data..."
-    
+
     if [ -f "simple_mock_generator.py" ]; then
         python3 simple_mock_generator.py
     else
@@ -161,7 +161,7 @@ create_test_data() {
 setup_database() {
     echo
     print_status "info" "Setting up database..."
-    
+
     if [ -f "setup_database.py" ]; then
         python3 setup_database.py
     else

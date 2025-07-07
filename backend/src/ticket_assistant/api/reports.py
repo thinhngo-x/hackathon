@@ -2,10 +2,13 @@
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ticket_assistant.core.models import ReportRequest, ReportResponse
+from ticket_assistant.core.models import ReportRequest
+from ticket_assistant.core.models import ReportResponse
 from ticket_assistant.database.connection import get_db
 from ticket_assistant.services.database_services import EnhancedReportService
 from ticket_assistant.services.report_service import ReportService
@@ -26,10 +29,7 @@ def get_report_service() -> ReportService:
 
 
 @router.post("", response_model=ReportResponse)
-async def create_ticket_report(
-    report: ReportRequest, 
-    db: AsyncSession = Depends(get_db)
-) -> ReportResponse:
+async def create_ticket_report(report: ReportRequest, db: AsyncSession = Depends(get_db)) -> ReportResponse:
     """Create a new ticket from a report and save to database.
 
     This endpoint accepts a report with name, keywords, and description,
@@ -37,28 +37,27 @@ async def create_ticket_report(
     """
     try:
         logger.info(f"Creating ticket from report: {report.name}")
-        
+
         # Create enhanced service
         enhanced_service = EnhancedReportService()
-        
+
         # Create ticket in database
         response, ticket = await enhanced_service.send_report_with_database(
             report=report,
             db_session=db,
         )
-        
+
         logger.info(f"Ticket created successfully with ID: {ticket.id}")
         return response
 
     except Exception as e:
         logger.error(f"Error creating ticket: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to create ticket: {str(e)}") from e
+        raise HTTPException(status_code=500, detail=f"Failed to create ticket: {e!s}") from e
 
 
 @router.post("/legacy", response_model=ReportResponse)
 async def send_report_legacy(
-    report: ReportRequest, 
-    service: ReportService = Depends(get_report_service)
+    report: ReportRequest, service: ReportService = Depends(get_report_service)
 ) -> ReportResponse:
     """Legacy endpoint that sends report to external API (for backward compatibility)."""
     try:
@@ -74,30 +73,27 @@ async def send_report_legacy(
 
     except Exception as e:
         logger.error(f"Error processing legacy report: {e}")
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}") from e
+        raise HTTPException(status_code=500, detail=f"Internal server error: {e!s}") from e
 
 
 @router.post("/mock", response_model=ReportResponse)
-async def create_mock_ticket_report(
-    report: ReportRequest, 
-    db: AsyncSession = Depends(get_db)
-) -> ReportResponse:
+async def create_mock_ticket_report(report: ReportRequest, db: AsyncSession = Depends(get_db)) -> ReportResponse:
     """Create a mock ticket in database for testing purposes."""
     try:
         logger.info(f"Creating mock ticket from report: {report.name}")
-        
+
         # Create enhanced service
         enhanced_service = EnhancedReportService()
-        
+
         # Create mock ticket in database
         response, ticket = await enhanced_service.mock_send_report_with_database(
             report=report,
             db_session=db,
         )
-        
+
         logger.info(f"Mock ticket created successfully with ID: {ticket.id}")
         return response
-        
+
     except Exception as e:
         logger.error(f"Error creating mock ticket: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to create mock ticket: {str(e)}") from e
+        raise HTTPException(status_code=500, detail=f"Failed to create mock ticket: {e!s}") from e

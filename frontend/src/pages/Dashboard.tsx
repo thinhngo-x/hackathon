@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
 
     // Listen for custom ticket creation events
     window.addEventListener('ticketCreated', handleTicketCreated);
-    
+
     return () => {
       window.removeEventListener('ticketCreated', handleTicketCreated);
     };

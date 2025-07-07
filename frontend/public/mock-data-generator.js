@@ -59,7 +59,7 @@ const TICKET_TEMPLATES = [
 function generateRandomTicket() {
   const template = TICKET_TEMPLATES[Math.floor(Math.random() * TICKET_TEMPLATES.length)];
   const ticketNumber = Math.floor(Math.random() * 1000) + 1;
-  
+
   return {
     name: `${template.name} #${ticketNumber}`,
     description: template.description,
@@ -72,37 +72,37 @@ function generateRandomTicket() {
 // Function to create multiple tickets
 async function createMockTickets(count = 10) {
   console.log(`🚀 Creating ${count} mock tickets...`);
-  
+
   // Check if ticketAssistantAPI is available
   if (typeof ticketAssistantAPI === 'undefined') {
     console.error('❌ ticketAssistantAPI not found. Make sure you are on a page where the API client is loaded.');
     return;
   }
-  
+
   const results = [];
-  
+
   for (let i = 0; i < count; i++) {
     try {
       const ticketData = generateRandomTicket();
       console.log(`📝 Creating ticket ${i + 1}/${count}: ${ticketData.name}`);
-      
+
       // Use the combined endpoint to create ticket with classification
       const result = await ticketAssistantAPI.submitTicketWithClassificationMock(ticketData);
-      
+
       console.log(`   ✅ Created: ${result.ticket.id} [${result.classification.department.toUpperCase()}/${result.classification.severity.toUpperCase()}]`);
       results.push(result);
-      
+
       // Small delay between requests
       await new Promise(resolve => setTimeout(resolve, 200));
-      
+
     } catch (error) {
       console.error(`   ❌ Failed to create ticket ${i + 1}:`, error);
     }
   }
-  
+
   console.log(`\n🎉 Mock data generation complete!`);
   console.log(`✅ Successfully created ${results.length} tickets`);
-  
+
   // Show summary
   if (results.length > 0) {
     console.log('\n📊 Department distribution:');
@@ -114,7 +114,7 @@ async function createMockTickets(count = 10) {
     Object.entries(deptCounts).forEach(([dept, count]) => {
       console.log(`   ${dept.toUpperCase()}: ${count} tickets`);
     });
-    
+
     console.log('\n⚠️ Severity distribution:');
     const severityCounts = {};
     results.forEach(r => {
@@ -125,16 +125,16 @@ async function createMockTickets(count = 10) {
       console.log(`   ${severity.toUpperCase()}: ${count} tickets`);
     });
   }
-  
+
   // Trigger dashboard refresh
   console.log('\n🔄 Triggering dashboard refresh...');
-  window.dispatchEvent(new CustomEvent('ticketCreated', { 
-    detail: { 
+  window.dispatchEvent(new CustomEvent('ticketCreated', {
+    detail: {
       message: `${results.length} mock tickets created`,
-      count: results.length 
-    } 
+      count: results.length
+    }
   }));
-  
+
   return results;
 }
 
@@ -142,14 +142,14 @@ async function createMockTickets(count = 10) {
 async function createTestTicket() {
   const ticketData = generateRandomTicket();
   console.log('🧪 Creating test ticket:', ticketData.name);
-  
+
   try {
     const result = await ticketAssistantAPI.submitTicketWithClassificationMock(ticketData);
     console.log('✅ Test ticket created:', result);
-    
+
     // Trigger dashboard refresh
     window.dispatchEvent(new CustomEvent('ticketCreated', { detail: result }));
-    
+
     return result;
   } catch (error) {
     console.error('❌ Failed to create test ticket:', error);

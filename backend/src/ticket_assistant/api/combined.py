@@ -3,7 +3,9 @@
 import logging
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
+from fastapi import Depends
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ticket_assistant.api.classification import get_groq_classifier
@@ -37,11 +39,11 @@ async def classify_and_create_ticket(
 
         # First, classify the error
         classification = await classifier.classify_error(
-            error_description=report.description, 
+            error_description=report.description,
             error_message=report.error_message,
-            context=getattr(report, 'context', None)
+            context=getattr(report, "context", None),
         )
-        
+
         # Create enhanced report service
         enhanced_service = EnhancedReportService()
 
@@ -79,7 +81,7 @@ async def classify_and_create_ticket(
                 "success": report_result.success,
                 "message": report_result.message,
                 "ticket_id": report_result.ticket_id,
-            }
+            },
         }
 
         logger.info(f"Successfully created ticket {ticket.id} with classification")
@@ -87,10 +89,7 @@ async def classify_and_create_ticket(
 
     except Exception as e:
         logger.error(f"Error in classify-and-create-ticket operation: {e}")
-        raise HTTPException(
-            status_code=500, 
-            detail=f"Failed to classify and create ticket: {str(e)}"
-        ) from e
+        raise HTTPException(status_code=500, detail=f"Failed to classify and create ticket: {e!s}") from e
 
 
 @router.post("/classify-and-create-ticket-mock", response_model=dict[str, Any])
@@ -105,11 +104,11 @@ async def classify_and_create_ticket_mock(
 
         # First, classify the error
         classification = await classifier.classify_error(
-            error_description=report.description, 
+            error_description=report.description,
             error_message=report.error_message,
-            context=getattr(report, 'context', None)
+            context=getattr(report, "context", None),
         )
-        
+
         # Create enhanced report service
         enhanced_service = EnhancedReportService()
 
@@ -147,7 +146,7 @@ async def classify_and_create_ticket_mock(
                 "success": report_result.success,
                 "message": report_result.message,
                 "ticket_id": report_result.ticket_id,
-            }
+            },
         }
 
         logger.info(f"Successfully created mock ticket {ticket.id} with classification")
@@ -155,10 +154,7 @@ async def classify_and_create_ticket_mock(
 
     except Exception as e:
         logger.error(f"Error in mock classify-and-create-ticket operation: {e}")
-        raise HTTPException(
-            status_code=500, 
-            detail=f"Failed to classify and create mock ticket: {str(e)}"
-        ) from e
+        raise HTTPException(status_code=500, detail=f"Failed to classify and create mock ticket: {e!s}") from e
 
 
 # Legacy endpoints for backward compatibility
@@ -195,4 +191,4 @@ async def classify_and_send_report_legacy(
 
     except Exception as e:
         logger.error(f"Error in legacy combined operation: {e}")
-        raise HTTPException(status_code=500, detail=f"Legacy combined operation error: {str(e)}") from e
+        raise HTTPException(status_code=500, detail=f"Legacy combined operation error: {e!s}") from e
