@@ -86,7 +86,7 @@ class TestAPIIntegration:
             "description": "This is an integration test report",
         }
 
-        response = client.post("/reports/mock", json=report_data)
+        response = client.post("/api/reports/mock", json=report_data)
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True

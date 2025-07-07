@@ -82,12 +82,12 @@ class TestMainAPI:
 
     def test_send_mock_report(self, client, sample_report_data):
         """Test sending a mock report (doesn't require external API)"""
-        response = client.post("/reports/mock", json=sample_report_data)
+        response = client.post("/api/reports/mock", json=sample_report_data)
         assert response.status_code == 200
 
         data = response.json()
         assert data["success"] is True
-        assert data["message"] == "Mock report sent successfully"
+        assert data["message"] == "Ticket created successfully"
         assert data["ticket_id"] is not None
         assert len(data["ticket_id"]) == 36  # UUID length
 
@@ -99,7 +99,7 @@ class TestMainAPI:
             "description": "",
         }
 
-        response = client.post("/reports/mock", json=invalid_data)
+        response = client.post("/api/reports/mock", json=invalid_data)
         # Should still work with mock but name will be empty
         assert response.status_code == 200
 
@@ -130,7 +130,7 @@ class TestMainAPI:
         original_classifier = classification.groq_classifier
         classification.groq_classifier = mock_classifier
 
-        response = client.post("/classify", json=sample_classification_data)
+        response = client.post("/api/classification", json=sample_classification_data)
 
         # Restore original classifier
         classification.groq_classifier = original_classifier
@@ -152,7 +152,7 @@ class TestMainAPI:
         original_classifier = classification.groq_classifier
         classification.groq_classifier = None
 
-        response = client.post("/classify", json=sample_classification_data)
+        response = client.post("/api/classification", json=sample_classification_data)
 
         # Restore original classifier
         classification.groq_classifier = original_classifier
@@ -218,7 +218,7 @@ class TestMainAPI:
         # Also set the classification module's classifier
         classification.groq_classifier = mock_classifier
 
-        response = client.post("/combined/classify-and-send", json=sample_report_data)
+        response = client.post("/api/combined/classify-and-create-ticket", json=sample_report_data)
 
         # Restore original services
         combined.groq_classifier = original_classifier
@@ -229,20 +229,20 @@ class TestMainAPI:
         data = response.json()
         assert "report_result" in data
         assert "classification" in data
-        assert "ticket_data" in data
+        assert "ticket" in data
         assert data["classification"]["department"] == "backend"
 
     def test_send_report_without_service(self, client, sample_report_data):
         """Test sending report when service is not available"""
         # This will use the actual report service which should work
-        response = client.post("/reports", json=sample_report_data)
+        response = client.post("/api/reports", json=sample_report_data)
         # Should work but might fail due to external API call
         # The actual behavior depends on whether external API is available
         assert response.status_code in [200, 500]  # Either success or internal error
 
     def test_invalid_json_request(self, client):
         """Test sending invalid JSON to endpoints"""
-        response = client.post("/reports/mock", json="invalid json structure")
+        response = client.post("/api/reports/mock", json="invalid json structure")
         assert response.status_code == 422  # Validation error
 
     def test_missing_required_fields(self, client):
@@ -252,7 +252,7 @@ class TestMainAPI:
             # Missing keywords and description
         }
 
-        response = client.post("/reports/mock", json=incomplete_data)
+        response = client.post("/api/reports/mock", json=incomplete_data)
         assert response.status_code == 422  # Validation error
 
         error_detail = response.json()
@@ -279,7 +279,7 @@ class TestMainAPI:
 
         app.dependency_overrides[get_groq_classifier] = get_mock_classifier
 
-        response = client.post("/classify", json=sample_classification_data)
+        response = client.post("/api/classification", json=sample_classification_data)
 
         # Clean up
         app.dependency_overrides = {}

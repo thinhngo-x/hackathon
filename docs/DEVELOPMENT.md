@@ -56,7 +56,7 @@ LOG_LEVEL=INFO
 
 ```bash
 # Start the server
-uv run python main.py
+uv run python src/ticket_assistant/api/main.py
 
 # Or with uvicorn directly
 uv run uvicorn ticket_assistant.api.main:app --reload --host 0.0.0.0 --port 8000
@@ -74,6 +74,7 @@ The project includes comprehensive VS Code configuration:
 4. **Tasks** are available via Ctrl+Shift+P
 
 **Key VS Code Features:**
+
 - **Linting**: Ruff integration
 - **Formatting**: Auto-format on save
 - **Testing**: Integrated pytest runner
@@ -93,6 +94,7 @@ pre-commit run --all-files
 ```
 
 **Pre-commit includes:**
+
 - **Ruff** - Linting and formatting
 - **Bandit** - Security scanning
 - **Safety** - Vulnerability checks
@@ -185,6 +187,7 @@ uv run mypy src/
 Use the provided VS Code tasks or run commands directly:
 
 ### VS Code Tasks (Ctrl+Shift+P → "Tasks: Run Task")
+
 - **Install Dependencies**
 - **Run Tests**
 - **Run Tests with Coverage**

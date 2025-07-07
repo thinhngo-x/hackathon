@@ -8,6 +8,7 @@ A professionally organized, AI-powered ticket reporting and classification syste
 **Focus**: Modern full-stack development with AI integration and cloud-native deployment
 
 ### Key Features
+
 - 🤖 **AI-Powered Classification** using Groq API with Llama 3.1
 - ⚡ **Real-time Analysis** with instant feedback
 - 🎨 **Modern React Frontend** with TypeScript and Tailwind CSS
@@ -16,30 +17,62 @@ A professionally organized, AI-powered ticket reporting and classification syste
 
 ## 🚀 Quick Start
 
+> **New to the project?** Check out [QUICKSTART.md](QUICKSTART.md) for a 30-second setup guide!
+
 ### Prerequisites
+
 - Python 3.9+ with [uv](https://docs.astral.sh/uv/) package manager
 - Node.js 18+ with npm
-- Docker (for deployment)
+- Git
+- Docker (optional, for deployment)
+
+### Installation
+
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# Or with pip: pip install uv
+```
 
 ### Development Setup
 
 ```bash
-# 1. Install root dependencies
+# 1. Clone the repository
+git clone <repository-url>
+cd ticket-assistant
+
+# 2. Quick start with the startup script (recommended)
+./start.sh
+
+# OR Manual setup:
+
+# 3. Install root dependencies for frontend
 cd frontend
 npm install
 
-# 2. Set up backend environment
-cd backend
+# 4. Set up backend environment
+cd ../backend
 cp .env.example .env
-# Edit .env and add your Groq API key
+# Edit .env and add your Groq API key (optional - will use mock responses if not provided)
 uv sync --dev
 
-# 3. Run both frontend and backend
-cd ../frontend
+# 5. Run both frontend and backend (Option 1: Using npm scripts)
+cd ..
 npm run dev
 
-# Backend: http://localhost:8000/docs (API documentation)
-# Frontend: http://localhost:3000 (Coming soon!)
+# OR Option 2: Run individually
+# Terminal 1 - Backend:
+cd backend
+uv run python src/ticket_assistant/api/main.py
+
+# Terminal 2 - Frontend:
+cd frontend
+npm run dev
+
+# Access the application:
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:8000
+# API Documentation: http://localhost:8000/docs
 ```
 
 ### Backend Only
@@ -79,7 +112,9 @@ ticket-assistant/
 
 - **Report Submission**: Send structured reports with name, keywords, and descriptions to a ticket API endpoint
 - **AI Classification**: Use Groq API to automatically classify errors and route them to relevant departments
+
 ### Backend Features
+
 - **AI-Powered Classification**: Real-time analysis using Groq API with Llama 3.1
 - **Department Routing**: Automatic routing to 8 technical departments
 - **Severity Assessment**: 4-level severity classification (low, medium, high, critical)
@@ -89,6 +124,7 @@ ticket-assistant/
 - **Modern Python Structure**: Follows src/ layout best practices
 
 ### Frontend Features (In Development)
+
 - **React 18 + Vite**: Lightning-fast development and build times
 - **TypeScript**: Full type safety with shared types
 - **Real-time Classification**: Live AI feedback as users type
@@ -112,6 +148,7 @@ docker-compose up -d
 ### Vultr Cloud Deployment
 
 See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for comprehensive Vultr deployment guides including:
+
 - Single instance deployment
 - Kubernetes (VKE) deployment
 - Load balancer configuration
@@ -174,13 +211,45 @@ API_PORT=8000
 DEBUG=True
 ```
 
+## 🔍 Troubleshooting
+
+### Common Issues
+
+1. **Backend not starting**
+
+   - Make sure you're running the correct main file: `uv run python src/ticket_assistant/api/main.py`
+   - Check that all dependencies are installed: `uv sync --dev`
+   - Verify the `.env` file exists (copy from `.env.example`)
+
+2. **Frontend not loading**
+
+   - Ensure all npm packages are installed: `npm install`
+   - Check that the backend is running on port 8000
+   - Verify no other process is using port 3000
+
+3. **Missing Groq API Key**
+   - The application will work without a Groq API key using mock responses
+   - To use real AI classification, add your Groq API key to the `.env` file
+
+### Port Configuration
+
+- **Backend**: http://localhost:8000
+- **Frontend**: http://localhost:3000
+- **API Docs**: http://localhost:8000/docs
+
+### Logs
+
+Check the terminal output for detailed error messages. The backend uses structured logging to help with debugging.
+
 ## 🎯 Hackathon Project
 
-This project was built for the **RAISE YOUR HACK** hackathon (July 4-8, 2025) as part of the **Qualcomm Track**, demonstrating:
+This project was built for the **RAISE YOUR HACK** hackathon (July 4-8, 2025) as part of the **Vultr Track**, demonstrating:
+
 - AI-powered ticket classification using Groq API
-- Modern Python development practices
+- Modern full-stack development with FastAPI and React
+- Cloud-native deployment optimized for Vultr infrastructure
 - Comprehensive testing and documentation
-- Production-ready FastAPI architecture
+- Production-ready architecture with Docker support
 
 ## 📄 License
 

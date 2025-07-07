@@ -18,10 +18,10 @@ uv sync --dev
 
 # Set up environment
 cp .env.example .env
-# Edit .env and add your Groq API key
+# Edit .env and add your Groq API key (optional - will use mock responses if not provided)
 
 # Run the server
-uv run python main.py
+uv run python src/ticket_assistant/api/main.py
 
 # Visit http://localhost:8000/docs for API documentation
 ```
@@ -38,6 +38,9 @@ uv run ruff format
 
 # Run with auto-reload
 uv run uvicorn src.ticket_assistant.api.main:app --reload
+
+# Alternative: Run directly with Python
+uv run python src/ticket_assistant/api/main.py
 ```
 
 ## API Endpoints
