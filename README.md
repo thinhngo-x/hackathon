@@ -134,7 +134,19 @@ ticket-assistant/
 
 ## 🚀 Deployment
 
-### Quick Deploy with Docker
+### Quick Deploy to Vultr Cloud ⚡
+
+```bash
+# One-command deployment to Vultr
+./scripts/quick-deploy.sh
+
+# Or setup and deploy manually
+./scripts/setup-vultr.sh
+export VULTR_API_KEY="your_api_key_here"
+./scripts/deploy-vultr.sh
+```
+
+### Local Development
 
 ```bash
 # Build and run with Docker Compose
@@ -145,14 +157,13 @@ docker-compose up -d
 # Backend: http://localhost:8000
 ```
 
-### Vultr Cloud Deployment
+### Vultr Cloud Deployment Options
 
-See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for comprehensive Vultr deployment guides including:
+- **Single Instance** ($10/month) - Perfect for demos and testing
+- **Kubernetes Cluster** ($30/month) - Production-ready with auto-scaling
+- **Load Balanced** - High availability setup
 
-- Single instance deployment
-- Kubernetes (VKE) deployment
-- Load balancer configuration
-- Performance optimization
+See [DEPLOY.md](DEPLOY.md) for quick start or [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for comprehensive guides.
 
 ## 📚 Documentation
 

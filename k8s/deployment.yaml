@@ -1,0 +1,182 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ticket-assistant
+  labels:
+    name: ticket-assistant
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticket-assistant-backend
+  namespace: ticket-assistant
+  labels:
+    app: ticket-assistant-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ticket-assistant-backend
+  template:
+    metadata:
+      labels:
+        app: ticket-assistant-backend
+    spec:
+      containers:
+      - name: backend
+        image: ticket-assistant-backend:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: GROQ_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: groq-api-key
+        - name: API_HOST
+          value: "0.0.0.0"
+        - name: API_PORT
+          value: "8000"
+        - name: DEBUG
+          value: "false"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-assistant-backend
+  namespace: ticket-assistant
+  labels:
+    app: ticket-assistant-backend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+  selector:
+    app: ticket-assistant-backend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ticket-assistant-frontend
+  namespace: ticket-assistant
+  labels:
+    app: ticket-assistant-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ticket-assistant-frontend
+  template:
+    metadata:
+      labels:
+        app: ticket-assistant-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: ticket-assistant-frontend:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: REACT_APP_API_URL
+          value: "http://ticket-assistant-backend:8000"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-assistant-frontend
+  namespace: ticket-assistant
+  labels:
+    app: ticket-assistant-frontend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: ticket-assistant-frontend
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+  namespace: ticket-assistant
+type: Opaque
+data:
+  groq-api-key: ""  # Base64 encoded GROQ API key - fill this in
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ticket-assistant-ingress
+  namespace: ticket-assistant
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - host: ticket-assistant.example.com  # Replace with your domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ticket-assistant-frontend
+            port:
+              number: 80
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: ticket-assistant-backend
+            port:
+              number: 8000
+      - path: /docs
+        pathType: Prefix
+        backend:
+          service:
+            name: ticket-assistant-backend
+            port:
+              number: 8000
