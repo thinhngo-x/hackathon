@@ -42,8 +42,8 @@ const TicketSubmission: React.FC = () => {
   const submitMutation = useMutation({
     mutationFn: async (data: TicketSubmissionForm) => {
       // Use the combined endpoint that classifies and creates ticket in database
-      return await ticketAssistantAPI.classifyAndCreateTicket({
-        name: data.name,
+      return await ticketAssistantAPI.submitTicketWithClassification({
+        name: data.title, // Use title as the ticket name
         description: data.description,
         keywords: data.title.split(' ').filter(word => word.length > 2), // Generate keywords from title
         error_message: data.error_message,
