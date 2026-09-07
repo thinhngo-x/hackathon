@@ -1,7 +1,7 @@
 repos:
   # Ruff - Modern Python linter and formatter
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.2
+    rev: v0.16.6
     hooks:
       # Run the linter
       - id: ruff
@@ -13,7 +13,7 @@ repos:
 
   # Pre-commit hooks for basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -27,7 +27,7 @@ repos:
 
   # Security checks with Bandit
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.8.5
+    rev: 1.9.4
     hooks:
       - id: bandit
         args: [-r, src/, --format=json, --output=bandit-report.json, --skip=B104]
