@@ -4,9 +4,9 @@ Main test runner for the Ticket Assistant system.
 This script provides various testing and inspection options.
 """
 
-import sys
-import subprocess
 import argparse
+import subprocess
+import sys
 from pathlib import Path
 
 # Get the project root directory

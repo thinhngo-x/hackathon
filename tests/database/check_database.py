@@ -4,15 +4,15 @@ Database health check script - Verify database connection and basic operations
 """
 
 import asyncio
-import sys
 import os
+import sys
 
 # Add the backend src directory to the Python path
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../backend/src"))
 
-from ticket_assistant.database.connection import init_db, AsyncSessionLocal, engine
-from ticket_assistant.database.repositories.ticket_repository import TicketRepository
 from sqlalchemy import text
+from ticket_assistant.database.connection import AsyncSessionLocal, engine, init_db
+from ticket_assistant.database.repositories.ticket_repository import TicketRepository
 
 
 async def test_database_connection():

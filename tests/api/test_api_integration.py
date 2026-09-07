@@ -4,14 +4,13 @@ API Integration Test Script - Test database through API endpoints
 """
 
 import json
-import urllib.request
 import urllib.parse
-from typing import Dict
+import urllib.request
 
 API_BASE_URL = "http://localhost:8000"
 
 
-def make_request(endpoint: str, method: str = "GET", data: Dict = None) -> Dict:
+def make_request(endpoint: str, method: str = "GET", data: dict = None) -> dict:
     """Make HTTP request to API."""
     try:
         url = f"{API_BASE_URL}{endpoint}"
