@@ -4,8 +4,8 @@ Simple database inspector using raw SQLite
 No external dependencies required
 """
 
-import sqlite3
 import os
+import sqlite3
 import sys
 
 
