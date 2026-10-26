@@ -9,7 +9,6 @@ import random
 import time
 import urllib.parse
 import urllib.request
-from typing import Dict
 
 # Configuration
 API_BASE_URL = "http://localhost:8000"
@@ -49,7 +48,7 @@ TICKET_TEMPLATES = [
 ]
 
 
-def make_http_request(url: str, data: Dict = None, method: str = "GET") -> Dict:
+def make_http_request(url: str, data: dict = None, method: str = "GET") -> dict:
     """Make HTTP request using urllib."""
     try:
         if data:
@@ -82,7 +81,7 @@ def check_api_health() -> bool:
         return False
 
 
-def generate_mock_ticket() -> Dict:
+def generate_mock_ticket() -> dict:
     """Generate a random mock ticket."""
     template = random.choice(TICKET_TEMPLATES)
     ticket_number = random.randint(1, 999)
@@ -95,13 +94,13 @@ def generate_mock_ticket() -> Dict:
     }
 
 
-def create_ticket(ticket_data: Dict) -> Dict:
+def create_ticket(ticket_data: dict) -> dict:
     """Create a ticket using the API."""
     url = f"{API_BASE_URL}/api/combined/classify-and-create-ticket-mock"
     return make_http_request(url, ticket_data, "POST")
 
 
-def get_dashboard_stats() -> Dict:
+def get_dashboard_stats() -> dict:
     """Get dashboard statistics."""
     url = f"{API_BASE_URL}/api/dashboard/stats"
     return make_http_request(url)

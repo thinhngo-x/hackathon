@@ -3,8 +3,8 @@
 Simple database query tool using raw SQL
 """
 
-import sqlite3
 import os
+import sqlite3
 import sys
 
 # Database file path
